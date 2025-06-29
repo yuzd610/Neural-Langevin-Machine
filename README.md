@@ -52,18 +52,7 @@ The experiments are organized into scripts that should be run in numerical order
 -   `b_size`: The batch size for training data samples.
 -   `N_model`: The number of model states simulated in parallel during the training phase.
 
-## Citation
 
-If you use this code or find our work helpful in your research, please consider citing our paper.
-
-```bibtex
-@article{your_name_2024_nlm,
-  title={Neural Langevin Machine: a local asymmetric learning rule can be creative},
-  author={First Author and Second Author, et al.},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
-  year={2024}
-}
-```
 
 ## Contact
 
