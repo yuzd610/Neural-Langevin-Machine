@@ -47,6 +47,7 @@ The experiments are organized into scripts that should be run in numerical order
 -   `n_t`: The number of inner loop time steps for simulating the model dynamics during training.
 -   `T`: The effective temperature, controlling the level of noise in the dynamics.
 -   `N_image`: The number of images used from the dataset for training.
+-   `N_image1`: The number of images used from the dataset for pca base vector.
 -   `k`: The learning rate for the weight matrix updates.
 -   `lambda1`: The L2 regularization (weight decay) parameter.
 -   `b_size`: The batch size for training data samples.
