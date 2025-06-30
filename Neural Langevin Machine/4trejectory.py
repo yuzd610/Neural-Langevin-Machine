@@ -55,10 +55,10 @@ for i in tqdm(range(b), desc="Simulations Progress"):
             (1 - delta_t) * Y[:, :, i] +
             delta_t * h - delta_t * phi_prime(Y[:, :, i]) * delta_J + noise_size * torch.randn(N,batch_size,device=device))
 
-
+#Collect the last point
 goal =Y[:, -1, a:].T.cpu().numpy()
 
-#Collect the last point
+
 t=[]
 tra2=[]
 for i in tqdm(range(15000)):
