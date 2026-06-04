@@ -76,7 +76,7 @@ Generates novel digit samples by:
 - Decoding through VAE to image space
 - Visualizing generation process
 
-### 4. Multi-MSE Analysis
+### 4.AAI- Multi-MSE Analysis
 
 ```bash
 python 4AAI_multi_MSE.py
@@ -106,23 +106,6 @@ Creates comprehensive visualizations of generated digits alongside training data
 2. **Latent Learning**: Train generative model in compact space
 3. **Generation**: Sample latent codes, decode to images
 4. **Analysis**: Evaluate quality in both latent and image domains
-
-## Key Differences from PCD-10
-
-| Aspect | PCD-10 | AE-PCD-10 |
-|--------|--------|-----------|
-| Input Space | 784-dimensional | 30-dimensional latent |
-| Training Speed | Slower | Faster |
-| Interpretability | Direct pixel space | Latent representation |
-| Compression | None | VAE compression |
-| Reconstruction Error | N/A | VAE reconstruction loss |
-
-## Advantages
-
-- **Speed**: ~25x faster than full-space training (784D → 30D)
-- **Interpretability**: Latent space can be visualized and analyzed
-- **Flexibility**: Reusable VAE for different generative models
-- **Scalability**: Approach extends to higher-resolution images
 
 ---
 
