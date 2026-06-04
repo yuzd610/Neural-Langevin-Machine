@@ -1,7 +1,7 @@
 Persistent Contrastive Divergence (PCD) for Multi-Digit MNIST
 
 Overview
-This project implements an Energy-Based Model (EBM) trained on a specific subset of the MNIST dataset (digits 1, 3, and 6). It uses Persistent Contrastive Divergence (PCD) alongside Langevin dynamics to learn a continuous state-space representation of the data. The project extensively evaluates the generative process across logarithmic timesteps, tracking model quality using specialized metrics like Adversarial Accuracy Improvement (AAI) and the Mean Squared Error (MSE) of the covariance matrix.
+This project implements an Energy-Based Model (EBM) trained on a specific subset of the MNIST dataset (digits 1, 3, and 6). It uses one chain Persistent Contrastive Divergence (PCD) alongside Langevin dynamics to learn a continuous state-space representation of the data. The project extensively evaluates the generative process across logarithmic timesteps, tracking model quality using specialized metrics like Adversarial Accuracy Improvement (AAI) and the Mean Squared Error (MSE) of the covariance matrix.
 
 Key Features
 - Persistent Contrastive Divergence: Employs a persistent Markov chain to sample from the model distribution for efficient EBM gradient estimation.
