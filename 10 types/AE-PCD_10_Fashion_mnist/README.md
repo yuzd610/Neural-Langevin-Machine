@@ -21,7 +21,7 @@ AE-PCD_10_Fashion_mnist/
 ├── 1AE.py                         # Train the Variational Autoencoder
 ├── 2train_AE_PCD.py               # Train PCD in latent space
 ├── 3generate_AE_PCD.py            # Generate samples
-├── 4AAI_multi_MSE.py              # Multi-MSE analysis
+├── 4AAI_multi_MSE.py              # AAI- Multi-MSE analysis
 ├── 5image generate.py             # Visualize generated images
 ├── config.py                      # Hyperparameters
 ├── vae_mnist_30dim.pth            # Pre-trained VAE weights
@@ -73,13 +73,13 @@ python 3generate_AE_PCD.py
 
 Generates new Fashion MNIST images from random noise, starting in latent space then reconstructing to image space.
 
-### 4. Multi-MSE Analysis
+### 4.AAI- Multi-MSE Analysis
 
 ```bash
 python 4AAI_multi_MSE.py
 ```
 
-Computes Mean Squared Error metrics comparing generated vs. real samples.
+Computes AAI and Mean Squared Error metrics comparing generated vs. real samples.
 
 ### 5. Visualize Results
 
@@ -104,12 +104,6 @@ Creates comprehensive visualizations of generated samples alongside real data.
 3. **Generation**: Sample from learned latent distribution, then decode to image space
 4. **Analysis**: Compare statistical properties and quality of generated items
 
-## Key Advantages
-
-- **Scalability**: Significantly faster than operating on 784-dimensional space
-- **Interpretability**: Latent space can be analyzed and visualized
-- **Quality**: Combines representation learning with generative modeling
-- **Flexibility**: Can extend to other image datasets by retraining VAE
 
 ---
 
