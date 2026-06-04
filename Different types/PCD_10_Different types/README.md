@@ -1,148 +1,68 @@
-# PCD-10 Different Types: Cross-Domain Generalization
+EBM Capacity and Scaling Across MNIST Digit Classes
 
-## Overview
+Overview
+This project investigates the learning capacity and generalizability of continuous Energy-Based Models (EBMs) as the complexity of the data distribution increases. By training separate models on progressively larger subsets of MNIST digit classes (e.g., from just digits "0-1" up to the full "0-9" dataset), the project quantifies how data diversity impacts the model's ability to learn a stable energy landscape using Persistent Contrastive Divergence (PCD).
 
-This project applies the core PCD framework to **diverse data types and modalities beyond standard MNIST**. By training on different digit styles, non-digit image categories, or alternative data representations, this experiment investigates the generalizability of the local learning rule across different domains.
+Key Features
+- Progressive Complexity Scaling: Automatically subsets the MNIST dataset to train independent models on 2 classes, 3 classes, and so on, up to 10 classes.
+- Continuous PCD Training: Maps discrete image pixels to an unbounded continuous space via atanh and trains models using Persistent Contrastive Divergence with k=10 Langevin steps.
+- Capacity Evaluation Metrics: Tracks the degradation or stability of generation fidelity using Adversarial Accuracy Improvement (AAI) and Covariance MSE as the number of target digit classes increases.
+- Side-by-Side Visualizations: Generates a seamless visual grid mapping the specific digit class subsets (e.g., "0-1", "0-3", "0-9") directly to their generated image counterparts.
 
-This serves as a critical test of whether the learned dynamics principles are truly general or specific to handwritten digits.
+Project Structure
 
-## Key Features
+[Scripts]
+- 1train_PCD_multi.py : Iteratively filters MNIST by class count, trains separate EBMs, and saves weights.
+- 2generate_multi.py : Loads the trained models and simulates Langevin dynamics to generate sample trajectories.
+- 3AAI_multi_MSE.py : Evaluates generation fidelity (AAI and Covariance MSE) against the number of digit classes.
+- 4image generate.py : Creates a visual grid showing generated digits corresponding to increasing class counts.
+- config.py : Centralized hyperparameters.
 
-- **Multi-Domain Learning**: PCD applied beyond standard MNIST
-- **Cross-Type Generalization**: Tests algorithm robustness
-- **Alternative Data Modalities**: Explores different input types
-- **Generalization Principles**: Validates core learning rule universality
-- **Comparative Analysis**: Benchmark against standard MNIST performance
-- **Domain Adaptation**: Understands how hyperparameters adapt across types
+[Directories]
+- checkpoints/ : Directory storing saved J and B_bias matrices for each class count subset.
+- generated_trajectories/ : Directory storing generated multi-step trajectories (.npy).
+- combined_visualizations/ : Directory storing the final visual grid PDF.
+- data/ : MNIST dataset storage (downloaded automatically).
 
-## Project Structure
+[Outputs]
+- aai_vs_classes.pdf : Line plot showing AAI error evolution as the dataset complexity (class count) increases.
+- mse_vs_classes.pdf : Line plot showing Covariance MSE evolution against the number of digit classes.
+- digits_generation_comparison.pdf : Clean visual grid comparing generated digits across subsets like "0-1", "0-3", "0-5", "0-7", and "0-9".
 
-```
-PCD_10_Different types/
-├── 1train_PCD_multi.py            # Train on different data types
-├── 2generate_multi.py             # Generate across types
-├── 3AAI_multi_MSE.py              # MSE analysis
-├── 4image generate.py             # Visualize results
-├── config.py                      # Hyperparameters
-├── checkpoints/                   # Training checkpoints
-├── combined_visualizations/       # Output visualizations
-├── generated_trajectories/        # Generation dynamics
-└── data/                          # Diverse dataset storage
-```
+Configuration
+Key hyperparameters defined in config.py:
+- N: 784 (Flattened image dimension)
+- g: 2 (Initialization scaling factor for J matrix)
+- delta_t: 0.01 (Time step for Langevin dynamics)
+- n: 500 (Total training epochs per model)
+- k: 10 (Langevin steps per PCD update)
+- T: 1 (Temperature/Noise scale)
+- N_data: 10000 (Maximum number of training samples used per subset)
+- eta: 0.00005 (Learning rate for Adam optimizer)
+- lambda1: 0.0000005 (L2 weight decay applied to J matrix)
 
-## Configuration
+Usage
 
-Key parameters in `config.py`:
+1. Train Models on Increasing Digit Classes
+Run: python 1train_PCD_multi.py
+Iterates through target class counts (2 through 10). Filters the dataset, trains an independent PCD model for 500 epochs on each subset, and saves the resulting J and B matrices to the checkpoints directory.
 
-- `N`: System dimensionality (varies by data type)
-- `g`: Coupling strength
-- `delta_t`: Time step
-- `n`: Training epochs
-- `k`: Learning rate
-- `T`: Temperature
-- `N_data`: Training samples (varies by domain)
-- `lambda1`: L2 regularization
-- `b_size`: Batch size
+2. Generate Trajectories
+Run: python 2generate_multi.py
+Loads the checkpoint for each class-count model and runs Langevin dynamics from random noise, saving the trajectory states across 22 logarithmic timesteps.
 
-## Usage
+3. Evaluate Capacity Metrics
+Run: python 3AAI_multi_MSE.py
+Reads the generated samples from the final timestep and strictly aligns them with the exact real training subsets. Computes and plots AAI and Covariance MSE to statistically demonstrate how model performance scales with data diversity.
 
-### 1. Train on Different Data Types
+4. Visualize Generated Digits
+Run: python 4image generate.py
+Parses the trajectory files specifically for models trained on 2, 4, 6, 8, and 10 digit classes. Generates a perfectly formatted, label-aligned PDF grid showing what the model produces at each complexity level.
 
-```bash
-python 1train_PCD_multi.py
-```
+Workflow
+1. Subsetting Data: The script slices MNIST not just by sample count, but by the number of unique categorical modes (digits) the distribution contains.
+2. Independent Training: A dedicated energy landscape is learned for each subset level using PCD.
+3. Metric Validation: Evaluates if a fixed-size network (784x784 parameters) suffers from capacity bottlenecks when asked to memorize/generalize 10 digits versus just 2 digits.
+4. Visual Confirmation: Outputs a grid that visually corroborates the statistical findings from the AAI and MSE plots.
 
-Trains PCD on non-standard MNIST data. May involve:
-- Different digit fonts or writing styles
-- Non-digit image categories (Fashion MNIST, SVHN, etc.)
-- Synthetic or augmented data
-- Mixed domain data
-
-### 2. Generate from Different Domains
-
-```bash
-python 2generate_multi.py
-```
-
-Generates samples for each data type to assess domain-specific performance.
-
-### 3. Compute MSE Analysis
-
-```bash
-python 3AAI_multi_MSE.py
-```
-
-Analyzes generation quality across different data types.
-
-### 4. Visualize Cross-Domain Results
-
-```bash
-python 4image generate.py
-```
-
-Creates side-by-side visualizations comparing:
-- Real samples from different types
-- Generated samples per type
-- Quality assessment across domains
-
-## Output
-
-- **checkpoints/**: Per-type training checkpoints
-- **generated_trajectories/**: Generation dynamics for each type
-- **combined_visualizations/**: Cross-type comparisons
-- **data/**: Multi-type dataset storage
-
-## Workflow
-
-1. **Multi-Type Loading**: Load diverse data types
-2. **Per-Type Training**: Train PCD on each data type
-3. **Generation**: Generate samples per domain
-4. **Cross-Domain Analysis**: Compare performance across types
-
-## Research Questions
-
-- **Algorithm Generality**: Does PCD work equally well across different data types?
-- **Hyperparameter Transfer**: Do optimal hyperparameters transfer across domains?
-- **Learning Curves**: How do convergence rates differ per type?
-- **Generation Quality**: Which domains are easier/harder to learn?
-- **Domain Adaptation**: What minimal adjustments enable cross-domain success?
-
-## Expected Results by Domain
-
-For different data types, you might observe:
-
-| Data Type | Learning Difficulty | Generation Quality | Training Time |
-|-----------|--------------------|--------------------|---------------|
-| Standard MNIST | Baseline | Baseline | Baseline |
-| Different Fonts | Easy | High | Fast |
-| Fashion Items | Medium | Medium | Moderate |
-| Synthetic Data | Easy/Hard | Varies | Variable |
-
-## Comparative Analysis
-
-Metrics to compare across types:
-- **MSE**: Mean squared error between real and generated
-- **Convergence**: Epochs to stable generation
-- **Diversity**: Sample-to-sample variation
-- **Recognizability**: Visual quality of generated samples
-
-## Applications
-
-This experiment validates:
-- **Universality**: Do local learning rules work for diverse problems?
-- **Robustness**: How sensitive is PCD to data type changes?
-- **Scalability**: Can the approach scale to complex domains?
-- **Practical utility**: How broadly applicable is the method?
-
-## Domain Recommendations
-
-Suggested data types to test:
-1. **Different MNIST variants**: Rotated, distorted, noisy digits
-2. **Fashion items**: Shoes, shirts, bags (Fashion MNIST)
-3. **Other categories**: Letters, symbols, shapes
-4. **Real-world data**: Street view house numbers (SVHN)
-5. **Synthetic data**: Computer-generated patterns
-
----
-
-**Key Insight**: If PCD successfully learns across diverse domains with minimal hyperparameter adjustment, it validates the generality of local, asymmetric learning rules as a fundamental principle for generative learning.
+Tip: Step 1 trains 9 separate models back-to-back for 500 epochs each. Ensure you are running this on a GPU, or adjust the "n" (epochs) in config.py for a quicker exploratory run!
