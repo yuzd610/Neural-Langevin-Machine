@@ -35,7 +35,7 @@ Key hyperparameters defined in config.py:
 - g: 2 (Initialization scaling factor for weight matrix J)
 - delta_t: 0.01 (Time step for Langevin dynamics)
 - n: 240 (Total training epochs)
-- k: 2600 (Number of Langevin steps for model sampling)
+- k: 2600 (Number of Langevin steps for model sampling)(perform 600 warm-up steps, then sample every 20 steps for a total of 100 times.)
 - T: 1 (Temperature/Noise scale for dynamics)
 - eta: 0.0005 (Learning rate for Adam optimizer)
 - lambda1: 0.000005 (L2 weight decay applied to J matrix)
