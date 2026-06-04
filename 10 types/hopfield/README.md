@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project implements a classical **Hopfield network** for content-addressable memory and generative dynamics. The Hopfield network is an early neural network model capable of storing and retrieving patterns through energy-based learning, making it a foundational architecture for understanding modern generative models.
+This project implements a classical **Hopfield network** for content-addressable memory . The Hopfield network is an early neural network model capable of storing and retrieving patterns through energy-based learning, making it a foundational architecture for understanding modern generative models.
 
 The implementation demonstrates how local, asymmetric learning rules can enable a network to learn complex patterns and generate novel variants by simulating the network's natural dynamics.
 
