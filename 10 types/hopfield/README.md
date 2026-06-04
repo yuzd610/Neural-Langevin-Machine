@@ -11,7 +11,7 @@ The implementation demonstrates how local, asymmetric learning rules can enable 
 - **Classical Architecture**: Pure Hopfield network implementation without modern extensions
 - **Content-Addressable Memory**: Store and retrieve patterns with partial or noisy cues
 - **Energy-Based Learning**: Convergence to learned patterns through energy minimization
-- **Generative Dynamics**: Create new samples by simulating the network evolution
+
 
 ## Project Structure
 
@@ -76,12 +76,4 @@ Shows original training patterns for comparison with generated samples.
 2. **Retrieval**: Given a partial or noisy pattern, the network converges to the nearest stored pattern
 3. **Generation**: Starting from noise, the network dynamics naturally evolve toward learned patterns
 
-## References
 
-- Hopfield, J. J. (1982). Neural networks and physical systems with emergent collective computational abilities
-- Energy-based models for generative learning
-- Local learning rules for distributed neural computation
-
----
-
-**Tip**: This is a foundational implementation. Compare results with the PCD-based models to understand how modern approaches build upon these classical ideas.
