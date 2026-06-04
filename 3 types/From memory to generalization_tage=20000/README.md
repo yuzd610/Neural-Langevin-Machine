@@ -73,10 +73,4 @@ Loads the saved J matrices and plots their eigenvalues in the complex plane to v
 Run: python 6PCA.py
 Projects the real data and the continuous Langevin generation process into a 3D PCA space, showing how noise settles into the targeted digit attractors over time.
 
-Workflow
-1. Training at Scale: Systematically trains many models to track how data volume affects network learning.
-2. Dynamics Simulation: Recovers data from learned matrices via noise-driven Langevin dynamics.
-3. Statistical Evaluation: Uses AAI across multiple seeds to reliably quantify the transition from overfitting/memorization (small data) to true generalization (large data).
-4. Deep Structural Analysis: Investigates the mathematical properties of the model via Eigenvalues and Manifold (PCA) projections.
 
-Tip: Execute the scripts strictly in numerical order (1 -> 6). Since Script 1 runs an extensive parameter sweep, ensure you have sufficient compute time or reduce `num_runs` / `target_steps` for a quicker test!
