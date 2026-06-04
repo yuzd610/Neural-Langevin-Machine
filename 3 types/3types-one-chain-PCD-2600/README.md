@@ -11,22 +11,18 @@ Key Features
 
 Project Structure
 EBM_PCD_MNIST/
-├── 1train_one_sample_multi.py    # Trains the EBM on digits 1, 3, 6 using PCD and saves checkpoints
-├── 2generate_multi.py            # Generates image trajectories using Langevin dynamics from checkpoints
-├── 3AAI_multi_MSE.py             # Evaluates generation quality (AAI & Covariance MSE) and plots results
-├── 4image generate.py            # Visualizes a grid of generated images across different parameter updates
-├── config.py                     # Centralized hyperparameters for training and generation
-├── checkpoints/                  # Directory storing saved J and B_bias matrices over time
-├── generated_trajectories/       # Directory storing the generated trajectories (.npy)
-├── aai_evolution.pdf             # Output plot: AAI evolution over generation steps
-├── steady_state.pdf              # Output plot: Steady-state metrics vs training updates
-├── mse_cov_evolution.pdf         # Output plot: Covariance MSE evolution
-├── compact_comparison_*.pdf      # Output plot: Grid visualizations of generated images
-└── data/                         # MNIST dataset storage (downloaded automatically)
+├── 1train_one_sample_multi.py  (Trains the EBM using PCD and saves checkpoints)
+├── 2generate_multi.py          (Generates trajectories using Langevin dynamics)
+├── 3AAI_multi_MSE.py           (Evaluates generation quality and plots results)
+├── 4image generate.py          (Visualizes generated images across updates)
+├── config.py                   (Centralized hyperparameters)
+├── checkpoints/                (Saved J and B_bias matrices over time)
+├── generated_trajectories/     (Generated .npy trajectory files)
+├── data/                       (MNIST dataset storage)
+└── [Output PDFs]               (aai_evolution, steady_state, mse_cov, etc.)
 
 Configuration
 Key hyperparameters defined in config.py:
-
 - N: 784 (Dimensionality of flattened 28x28 images)
 - g: 2 (Initialization scaling factor for weight matrix J)
 - delta_t: 0.01 (Time step for Langevin dynamics)
@@ -55,7 +51,7 @@ Run: python 4image generate.py
 Parses the generated trajectory files and creates a seamless, compact visual grid of generated digits at specific training checkpoints (e.g., 342, 988, 2854, etc.), saved as a PDF.
 
 Workflow
-1. Training: Maps discrete images to continuous space via atanh, then learns the EBM landscape using data gradients and model gradients (sampled via a persistent Langevin chain).
+1. Training: Maps discrete images to continuous space via atanh, then learns the EBM landscape using data gradients and model gradients.
 2. Generation: Reverses the process by starting with noise and allowing the learned energy landscape to guide the Langevin dynamics toward valid digit states.
 3. Evaluation: Uses rigorous statistical metrics (AAI and 2nd Moment MSE) rather than just visual inspection to prove the model has accurately captured the target distribution.
 4. Visualization: Compiles visual evidence of the model's generative improvement over parameter updates.
