@@ -67,10 +67,4 @@ Focuses on a specific trained model (e.g., at update 23836) and visually plots t
 Run: python 5eigenvalue.py
 Calculates and plots the complex eigenvalues of the interaction matrix J for each saved checkpoint, verifying the mathematical stability (e.g., adherence to the Elliptic Law) of the learned network.
 
-Workflow
-1. Training Constraint: Forces the network to learn a fast-mixing trajectory from noise to data within exactly 500 continuous steps.
-2. Unbounded Simulation: Runs generation far beyond the 500-step training limit to observe if the distribution holds steady or degrades.
-3. Metric Validation: Uses AAI and MSE curves to objectively identify the optimal generation time step.
-4. Visual & Structural Proof: Correlates the statistical metrics with visual digit formation and deep spectral analysis of the weight matrix.
 
-Tip: Execute the scripts sequentially (1 -> 5). Pay special attention to the output plots from Step 3 and 4, as they perfectly illustrate how Short-Run MCMC models are highly optimized for their specific training horizon (k=500)!
