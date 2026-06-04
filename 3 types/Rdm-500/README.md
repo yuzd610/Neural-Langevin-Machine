@@ -1,135 +1,76 @@
-# Rdm-500: Random Model Variant
+Short-Run MCMC Energy-Based Model (CD-k) on MNIST
 
-## Overview
+Overview
+This project implements an Energy-Based Model (EBM) trained on MNIST digits (1, 3, and 6) using Short-Run MCMC (Contrastive Divergence with k steps). Unlike Persistent Contrastive Divergence (PCD), this approach resets the Markov chains to random noise at every training iteration and runs Langevin dynamics for a fixed k=500 steps. The project heavily focuses on analyzing the temporal evolution of the generation process, specifically investigating how the model behaves when generating samples at, before, and after the exact k-steps it was trained on.
 
-This project explores a **variant PCD configuration with randomized initialization or augmented dimensionality**. By using a random model baseline or higher-dimensional system (500-D), this experiment investigates how network size and initialization strategies affect generative learning capacity.
+Key Features
+- Short-Run MCMC Training: Resets the Langevin dynamics chain to pure noise at every parameter update, strictly training the model to map noise to data in exactly k=500 steps.
+- Generation Trajectory Analysis: Evaluates Adversarial Accuracy Improvement (AAI) and Covariance MSE over logarithmic generation steps, identifying the optimal stopping point for generation.
+- Critical Step Highlighting: Visually and statistically marks Step 500 in the evaluation plots to demonstrate the correlation between the training constraint and generation fidelity.
+- Eigenvalue Stability Analysis: Computes and plots the complex eigenvalue spectrum of the learned J-matrix to ensure the structural stability of the learned energy landscape over training time.
+- Dynamics Visualization: Generates a visual timeline of a single model's sampling process, showing how random noise morphs into recognizable digits over specific Langevin steps.
 
-This serves as an important control and variant study to understand the role of network architecture in the success of generative learning.
+Project Structure
 
-## Key Features
+[Scripts]
+- 1train_RDM_multi.py : Trains the EBM using Short-Run MCMC (CD-500) and saves model checkpoints.
+- 2generate_multi.py : Simulates Langevin dynamics from noise, recording states at logarithmic timesteps.
+- 3AAI_multi_MSE.py : Evaluates AAI and Covariance MSE over generation steps, highlighting Step 500.
+- 4image generate.py : Creates a visual grid showing the evolution of images during the Langevin sampling process.
+- 5eigenvalue.py : Analyzes and plots the complex eigenvalue spectrum of the weight matrices.
+- config.py : Centralized hyperparameters.
 
-- **Extended Dimensionality**: 500-dimensional random feature space
-- **Variant Initialization**: Explores alternative weight initialization schemes
-- **Baseline Comparison**: Provides reference for understanding core 784-D experiments
-- **Scalability Analysis**: Tests how algorithm performs at different scales
-- **Control Experiment**: Isolates effects of network size from learning algorithm
+[Directories]
+- checkpoints/ : Directory storing saved J and B_bias matrices over parameter updates.
+- generated_trajectories/ : Directory storing the multi-step trajectories (.npy).
+- eigenvalue_plots/ : Directory storing PDF plots of the complex eigenvalue spectrums.
+- combined_visualizations/ : Directory storing output image grids.
+- data/ : MNIST dataset storage.
 
-## Project Structure
+[Outputs]
+- aai_evolution.pdf : Plot of AAI error over generation steps (with Step 500 marked).
+- steady_state.pdf : Plot of steady-state metrics vs training updates.
+- mse_cov_evolution.pdf : Broken-axis plot of Covariance MSE evolution (with Step 500 marked).
+- evolution_t_age_*.pdf : Visual grid tracking image evolution from noise to digits.
+- eigen_spectrum_idx_*_step_*.pdf : Scatter plots of Eigenvalues in the complex plane over time.
 
-```
-Rdm-500/
-├── 1train_RDM_multi.py            # Train random/variant model
-├── 2generate_multi.py             # Generate samples
-├── 3AAI_multi_MSE.py              # MSE analysis
-├── 4image generate.py             # Visualize results
-├── 5eigenvalue.py                 # Eigenvalue analysis
-├── config.py                      # Hyperparameters
-├── B_bias.npy                     # Learned biases
-├── J_final.npy                    # Final weights
-├── checkpoints/                   # Training checkpoints
-├── combined_visualizations/       # Visualizations
-├── eigenvalue_plots/              # Spectral analysis
-├── generated_trajectories/        # Generation dynamics
-└── data/                          # Dataset storage
-```
+Configuration
+Key hyperparameters defined in config.py:
+- N: 784 (Flattened image dimension)
+- g: 2 (Initialization scaling factor for J matrix)
+- delta_t: 0.01 (Time step for Langevin dynamics)
+- n: 2400 (Total training epochs)
+- k: 500 (Strict Langevin steps per training update from random noise)
+- T: 1 (Temperature/Noise scale)
+- eta: 0.00005 (Learning rate)
+- lambda1: 0.0000005 (L2 weight decay applied to J matrix)
 
-## Configuration
+Usage
 
-Key parameters in `config.py`:
+1. Train the EBM with Short-Run MCMC
+Run: python 1train_RDM_multi.py
+Filters the dataset for digits 1, 3, and 6. Trains the model by running 500 Langevin steps from pure noise at every update. Saves checkpoints logarithmically.
 
-- `N`: System dimensionality (500 - variant size)
-- `g`: Coupling strength
-- `delta_t`: Time step
-- `n`: Training epochs
-- `k`: Learning rate
-- `T`: Temperature
-- `N_data`: Training samples (10000)
-- `N_gen`: Generation samples (10000)
-- `lambda1`: L2 regularization
-- `b_size`: Batch size (1000)
+2. Generate Trajectories
+Run: python 2generate_multi.py
+Loads the saved models and runs an extended Langevin dynamics simulation (up to thousands of steps), recording the image states at specific logarithmic timesteps to capture the full evolution.
 
-## Usage
+3. Evaluate Generation Dynamics
+Run: python 3AAI_multi_MSE.py
+Computes AAI and Covariance MSE across the generation timesteps. Generates plots with a distinct vertical line at Step 500 to evaluate if generation quality peaks exactly where the model was trained to stop.
 
-### 1. Train Random/Variant Model
+4. Visualize Sampling Evolution
+Run: python 4image generate.py
+Focuses on a specific trained model (e.g., at update 23836) and visually plots the progression of digits forming from noise at sampling steps like 20, 99, 500, 2530, and 12808.
 
-```bash
-python 1train_RDM_multi.py
-```
+5. Analyze Spectral Stability
+Run: python 5eigenvalue.py
+Calculates and plots the complex eigenvalues of the interaction matrix J for each saved checkpoint, verifying the mathematical stability (e.g., adherence to the Elliptic Law) of the learned network.
 
-Trains the model with randomized or augmented architecture, learning from MNIST dataset.
+Workflow
+1. Training Constraint: Forces the network to learn a fast-mixing trajectory from noise to data within exactly 500 continuous steps.
+2. Unbounded Simulation: Runs generation far beyond the 500-step training limit to observe if the distribution holds steady or degrades.
+3. Metric Validation: Uses AAI and MSE curves to objectively identify the optimal generation time step.
+4. Visual & Structural Proof: Correlates the statistical metrics with visual digit formation and deep spectral analysis of the weight matrix.
 
-### 2. Generate Samples
-
-```bash
-python 2generate_multi.py
-```
-
-Generates samples in the variant configuration space.
-
-### 3. Compute MSE Analysis
-
-```bash
-python 3AAI_multi_MSE.py
-```
-
-Analyzes generation quality with variant architecture.
-
-### 4. Visualize Results
-
-```bash
-python 4image generate.py
-```
-
-Creates visualizations (may require dimensionality projection to 28×28 for display).
-
-### 5. Analyze Eigenvalue Spectrum
-
-```bash
-python 5eigenvalue.py
-```
-
-Studies the spectral properties of learned 500-D weight matrix.
-
-## Output
-
-- **checkpoints/**: Training checkpoints
-- **generated_trajectories/**: Generation time-series
-- **combined_visualizations/**: Generated samples and analysis
-- **eigenvalue_plots/**: Spectral properties
-- **B_bias.npy**, **J_final.npy**: Learned parameters
-
-## Workflow
-
-1. **Training**: PCD learning in 500-D random/variant space
-2. **Generation**: Network dynamics in extended space
-3. **Analysis**: Eigenvalue spectrum reveals structure
-4. **Comparison**: Results vs. standard 784-D full-image learning
-
-## Research Questions
-
-- **Does 500-D augmentation improve learning?** Can additional random dimensions help?
-- **Network size effects**: How does system size affect convergence and quality?
-- **Spectral properties**: How do eigenvalues differ from full 784-D learning?
-- **Generalization**: Does variant architecture hurt or help?
-
-## Comparison
-
-| Aspect | Standard PCD | Rdm-500 |
-|--------|--------------|---------|
-| Dimensionality | 784 | 500 |
-| Nature | Full image space | Random/variant space |
-| Role | Primary method | Baseline/variant |
-| Eigenvalue spectrum | 784 eigenvalues | 500 eigenvalues |
-| Generation quality | Baseline | Comparative |
-
-## Applications
-
-This variant is useful for:
-- **Control experiments**: Isolating effects of dimensionality
-- **Ablation studies**: Understanding importance of architecture choices
-- **Scalability**: Testing algorithm performance at different scales
-- **Random feature analysis**: Understanding role of feature space
-
----
-
-**Tip**: Compare eigenvalue spectra and MSE metrics between this variant and standard PCD-10 to understand how network architecture affects learning dynamics.
+Tip: Execute the scripts sequentially (1 -> 5). Pay special attention to the output plots from Step 3 and 4, as they perfectly illustrate how Short-Run MCMC models are highly optimized for their specific training horizon (k=500)!
