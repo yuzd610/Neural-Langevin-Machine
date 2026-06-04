@@ -13,14 +13,14 @@ Key Features
 
 Project Structure
 Hopfield_Continuous_MNIST/
-─ 1train_Hopfield.py             # Trains the Hopfield network on 10 distinct digits
-─ 2generate.py                   # Adds noise and runs dynamic evolution to recover patterns
-─ 3origin.py                     # Extracts and saves the clean original image for comparison
-─ hopfield_energy_weights.pth    # Pre-trained model weights (Generated after step 1)
-─ digit_step_*.pdf               # Snapshots of the image at different dynamic steps
-─ energy_descent_main.pdf        # Visualization of the energy descent curve
-─ original_digit_6.pdf           # Ground truth clean image
-─ data/                          # Dataset storage (downloaded automatically)
+- 1train_Hopfield.py             # Trains the Hopfield network on 10 distinct digits
+- 2generate.py                   # Adds noise and runs dynamic evolution to recover patterns
+- 3origin.py                     # Extracts and saves the clean original image for comparison
+- hopfield_energy_weights.pth    # Pre-trained model weights (Generated after step 1)
+- digit_step_*.pdf               # Snapshots of the image at different dynamic steps
+- energy_descent_main.pdf        # Visualization of the energy descent curve
+- original_digit_6.pdf           # Ground truth clean image
+- data/                          # Dataset storage (downloaded automatically)
 
 Configuration
 Key parameters used in the scripts:
