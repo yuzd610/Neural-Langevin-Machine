@@ -1,79 +1,34 @@
-# Hopfield Network - Content-Addressable Memory
+Continuous Hopfield Network on MNIST
 
-## Overview
+Overview
+This project implements a Continuous Hopfield Network (Energy-based Model) trained on the MNIST dataset. It demonstrates how to store specific digit patterns using gradient descent to minimize an energy function in an unbounded continuous space, and how to retrieve them from highly noisy states using dynamic continuous evolution (Euler method).
 
-This project implements a classical **Hopfield network** for content-addressable memory . The Hopfield network is an early neural network model capable of storing and retrieving patterns through energy-based learning, making it a foundational architecture for understanding modern generative models.
+The key insight is mapping bounded image pixels into an unbounded continuous space using an `atanh` transformation, learning the weight matrix via gradient descent, and strictly tracking the kinetic energy descent during pattern retrieval.
 
-The implementation demonstrates how local, asymmetric learning rules can enable a network to learn complex patterns and generate novel variants by simulating the network's natural dynamics.
+Key Features
+- Continuous State Space: Uses `atanh` transformation to map bounded pixel values [-1, 1] to unbounded continuous space.
+- Energy-Based Learning: Optimizes weight matrix J (with zero-diagonal) and bias b via Gradient Descent (Adam optimizer).
+- Robust Pattern Retrieval: Reconstructs digits from 25% random noise using continuous Euler dynamics.
+- Energy Tracking: Visualizes the strict monotonic descent of the system's kinetic energy during the retrieval process.
 
-## Key Features
+Project Structure
+Hopfield_Continuous_MNIST/
+├── 1train_Hopfield.py             # Trains the Hopfield network on 10 distinct digits
+├── 2generate.py                   # Adds noise and runs dynamic evolution to recover patterns
+├── 3origin.py                     # Extracts and saves the clean original image for comparison
+├── hopfield_energy_weights.pth    # Pre-trained model weights (Generated after step 1)
+├── digit_step_*.pdf               # Snapshots of the image at different dynamic steps
+├── energy_descent_main.pdf        # Visualization of the energy descent curve
+├── original_digit_6.pdf           # Ground truth clean image
+└── data/                          # Dataset storage (downloaded automatically)
 
-- **Classical Architecture**: Pure Hopfield network implementation without modern extensions
-- **Content-Addressable Memory**: Store and retrieve patterns with partial or noisy cues
-- **Energy-Based Learning**: Convergence to learned patterns through energy minimization
+Configuration
+Key parameters used in the scripts:
 
-
-## Project Structure
-
-```
-hopfield/
-├── 1train_Hopfield.py              # Train the Hopfield network
-├── 2generate.py                    # Generate new samples
-├── 3origin.py                      # Utility for origin/reference patterns
-├── hopfield_energy_weights.pth     # Saved network weights
-├── config.py                       # Hyperparameters configuration
-└── data/                           # Training data directory
-```
-
-## Configuration
-
-Edit `config.py` to customize the network:
-
-- `N`: Network size (dimensionality)
-- `g`: Coupling strength of synaptic weights
-- `delta_t`: Time step for dynamics simulation
-- `n`: Number of training epochs
-- `k`: Learning rate for weight updates
-- `T`: Temperature (noise level)
-- `N_data`: Number of training patterns
-- `lambda1`: L2 regularization coefficient
-
-## Usage
-
-### 1. Training
-
-```bash
-python 1train_Hopfield.py
-```
-
-Trains the Hopfield network on MNIST patterns and saves weights to `hopfield_energy_weights.pth`.
-
-### 2. Generation
-
-```bash
-python 2generate.py
-```
-
-Loads trained weights and generates new samples by simulating network dynamics from random initialization.
-
-### 3. Origin Reference
-
-```bash
-python 3origin.py
-```
-
-Shows original training patterns for comparison with generated samples.
-
-## Output
-
-- **checkpoints/**: Training checkpoints
-- **data/**: Dataset storage
-- **hopfield_energy_weights.pth**: Final trained network weights
-
-## How It Works
-
-1. **Learning**: Patterns are stored in the weight matrix using Hebbian-like rules
-2. **Retrieval**: Given a partial or noisy pattern, the network converges to the nearest stored pattern
-3. **Generation**: Starting from noise, the network dynamics naturally evolve toward learned patterns
-
-
+- N: Dimensionality of original images (784 for 28×28 flattened MNIST)
+- epsilon: 0.03 (clipping boundary before atanh transformation)
+- epochs: 1000 (training iterations for the energy model)
+- lr: 0.001 (Learning rate for Adam optimizer)
+- noise_ratio: 0.25 (25% random noise added during retrieval)
+- total_steps: 451 (Number of dynamics steps for the Euler method)
+- dt: 0.01 (Time step size for Euler integration)
