@@ -1,161 +1,82 @@
-# From Memory to Generalization: Extended Training Study
+EBM Scaling and Generalization on Multi-Digit MNIST
 
-## Overview
+Overview
+This project investigates the impact of training dataset size on the generalization capabilities of Energy-Based Models (EBMs). By training models on exponentially growing subsets of MNIST digits (1, 3, and 6) using Persistent Contrastive Divergence (PCD), the project analyzes how data volume affects model fidelity, stability, and memorization. To ensure statistical robustness, multiple independent runs are executed for each dataset size, accompanied by deep structural analyses including Eigenvalue spectrums and 3D PCA manifold tracking.
 
-This project investigates the **transition from memorization to true generalization** through **extended training (20,000+ epochs)**. By training for dramatically longer periods than standard approaches, this experiment explores:
+Key Features
+- Exponential Data Scaling: Trains models on dataset sizes growing exponentially (from 5 up to thousands of samples) to plot generalization curves.
+- Statistical Robustness: Executes 5 independent training runs for every dataset size to compute means and standard deviations (error bands) for evaluation metrics.
+- Spectral Analysis: Computes and visualizes the complex eigenvalue spectrum of the learned interaction matrix (J) to study system stability and dynamics.
+- Manifold Tracking: Uses 3D PCA to project and visualize how the Langevin dynamics generation trajectory navigates the learned energy landscape towards data attractors.
+- Comparative Evaluation: Strictly compares the generated data against the exact real data subset used during training to quantify memorization vs. generalization using the AAI metric.
 
-- How networks distinguish between memorizing training samples and learning underlying structure
-- Whether extended training improves or degrades generative quality  
-- The dynamics of learning curves over very long timescales
-- Generalization performance as a function of training stage
+Project Structure
 
-This is a deep investigation into the learning dynamics of generative models using local, asymmetric learning rules.
+[Scripts]
+- 1train_PCD_multi.py : Slices the dataset into exponential sizes, trains 5 runs per size, and saves weights.
+- 2generate_multi.py : Simulates Langevin dynamics for the trained models to generate image trajectories.
+- 3AAI_multi_MSE.py : Evaluates generation fidelity (AAI, Acc_S, Acc_T) with error bands across dataset sizes.
+- 4image_generate.py : Visualizes side-by-side grids of exact real training data vs. generated data.
+- 5eigenvalue.py : Analyzes the structural stability of the J matrix by plotting its complex eigenvalues.
+- 6PCA.py : Performs 3D PCA dimensionality reduction to visualize generation trajectories against the true data manifold.
+- config.py : Centralized hyperparameters.
 
-## Key Features
+[Directories]
+- data/ : MNIST dataset storage.
+- checkpoints_by_size/ : Stores J and B_bias matrices labeled by dataset size and run index.
+- generated_trajectories/ : Stores generated trajectories for each specific model.
+- eigenvalue_plots_by_size/ : Stores PDF plots of complex eigenvalue spectrums.
+- pca_plots_size_*/ : Stores PCA 3D trajectory plots and related image slices.
+- combined_visualizations/ : Stores output image grids.
 
-- **Extended Training**: 20,000+ epochs (vs. typical 1,000-12,000)
-- **Generalization Analysis**: Systematic study of memorization vs. learning
-- **Multiple Checkpoints**: Captures learning at different stages
-- **Long-Term Dynamics**: Understands convergence behavior over long training
-- **Memory-Generalization Tradeoff**: Empirically studies theoretical concepts
-- **PCA Analysis**: Principal component projection reveals learned structure
+[Outputs & Checkpoints]
+- aai_vs_datasize.pdf : Plot showing AAI error trends with standard deviation bands across dataset sizes.
+- accuracy_vs_datasize.pdf : Plot showing Real (Acc_S) vs Generated (Acc_T) classification accuracies.
+- real_vs_generated_comparison.pdf : Grid visualization directly comparing real inputs to generated outputs.
+- eigen_spectrum_size_*_run_*.pdf : Scatter plots of Eigenvalues in the complex plane.
+- pca_3d_trajectory.pdf : 3D visualization of the generated data moving toward the real data manifold.
 
-## Project Structure
+Configuration
+Key parameters defined in config.py:
+- N: 784 (Flattened image dimension)
+- g: 2 (Initialization scaling factor for J matrix)
+- delta_t: 0.01 (Time step for Langevin dynamics)
+- k: 10 (PCD Langevin steps per training update)
+- T: 1 (Temperature/Noise scale)
+- eta: 0.00005 (Learning rate for Adam optimizer)
+- lambda1: 0.0000005 (L2 weight decay applied to J matrix)
+- b_size: 1000 (Maximum batch size)
 
-```
-From memory to generalization_tage=20000/
-├── 1train_PCD_multi.py            # Extended training
-├── 2generate_multi.py             # Generate from checkpoints
-├── 3AAI_multi_MSE.py              # MSE analysis
-├── 4image_generate.py             # Visualize results
-├── 5eigenvalue.py                 # Eigenvalue spectrum
-├── 6PCA.py                        # PCA analysis at different stages
-├── config.py                      # Hyperparameters
-├── checkpoints_by_size/           # Checkpoints at training stages
-├── pca_plots_size_288/            # PCA visualizations
-├── combined_visualizations/       # Output visualizations
-├── generated_trajectories/        # Generation dynamics
-└── data/                          # Dataset storage
-```
+Usage
 
-## Configuration
+1. Train Models Across Dataset Sizes
+Run: python 1train_PCD_multi.py
+Splits MNIST (digits 1, 3, 6) into exponentially growing sizes. Trains 5 separate models per size for 20,000 steps each. (Note: This step trains up to 100 models and will take time!)
 
-Key parameters in `config.py`:
+2. Generate Trajectories
+Run: python 2generate_multi.py
+Loads the trained models and simulates Langevin dynamics (50,000 steps), saving the final converged trajectories.
 
-- `N`: System dimensionality (784)
-- `g`: Coupling strength
-- `delta_t`: Time step
-- `n`: Training epochs (20000+)
-- `k`: Learning rate
-- `T`: Temperature
-- `N_data`: Training samples (10000)
-- `lambda1`: L2 regularization (important for controlling overfitting)
-- `b_size`: Batch size
+3. Evaluate Generalization Metrics
+Run: python 3AAI_multi_MSE.py
+Computes AAI, Acc_S, and Acc_T. Groups the 5 runs per dataset size to calculate means and standard deviations, outputting smooth log-scale plots with error bands.
 
-## Usage
+4. Generate Visual Comparisons
+Run: python 4image_generate.py
+Creates side-by-side visual grids comparing the actual training subsets with the models' generated outputs.
 
-### 1. Extended Training
+5. Analyze Eigenvalue Spectrum
+Run: python 5eigenvalue.py
+Loads the saved J matrices and plots their eigenvalues in the complex plane to visually analyze the structural properties and stability of the learned energy landscapes.
 
-```bash
-python 1train_PCD_multi.py
-```
+6. Visualize 3D PCA Trajectories
+Run: python 6PCA.py
+Projects the real data and the continuous Langevin generation process into a 3D PCA space, showing how noise settles into the targeted digit attractors over time.
 
-Trains for 20,000+ epochs, saving checkpoints at regular intervals to track learning progression.
+Workflow
+1. Training at Scale: Systematically trains many models to track how data volume affects network learning.
+2. Dynamics Simulation: Recovers data from learned matrices via noise-driven Langevin dynamics.
+3. Statistical Evaluation: Uses AAI across multiple seeds to reliably quantify the transition from overfitting/memorization (small data) to true generalization (large data).
+4. Deep Structural Analysis: Investigates the mathematical properties of the model via Eigenvalues and Manifold (PCA) projections.
 
-### 2. Generate from Checkpoints
-
-```bash
-python 2generate_multi.py
-```
-
-Generates samples at different training stages to visualize how generation quality evolves.
-
-### 3. Compute MSE Analysis
-
-```bash
-python 3AAI_multi_MSE.py
-```
-
-Analyzes MSE metrics across different training stages, showing memorization vs. generalization.
-
-### 4. Visualize Generated Images
-
-```bash
-python 4image_generate.py
-```
-
-Creates visualizations showing:
-- How generated images evolve during training
-- Transition from memorization to generalization
-- Quality changes over 20,000 epochs
-
-### 5. Analyze Eigenvalue Spectrum
-
-```bash
-python 5eigenvalue.py
-```
-
-Computes eigenvalues at different training stages to understand spectral evolution.
-
-### 6. PCA Projection Analysis
-
-```bash
-python 6PCA.py
-```
-
-Projects generative trajectories onto PCA basis of training data, revealing:
-- How learned manifold develops over training
-- Convergence to data manifold
-- Dimensionality of learned structure
-
-## Output
-
-- **checkpoints_by_size/**: Weights at different training epochs (early, mid, late)
-- **pca_plots_size_288/**: PCA projections at different stages
-- **combined_visualizations/**: Generated samples across training stages
-- **generated_trajectories/**: Full generation dynamics
-- **Eigenvalue evolution**: How spectrum changes during training
-
-## Workflow
-
-1. **Early Training** (epochs 1-3000): Rapid learning, possible memorization
-2. **Mid Training** (epochs 3000-10000): Transition period
-3. **Late Training** (epochs 10000-20000): Convergence and generalization
-4. **Analysis**: Compare samples, eigenvalues, and PCA projections across stages
-
-## Key Research Questions
-
-- **When does memorization give way to generalization?** At what epoch does quality stabilize?
-- **Does performance improve monotonically?** Can extended training hurt generalization?
-- **Eigenvalue evolution**: How do spectral properties change?
-- **Data manifold convergence**: Does network better explore data manifold over time?
-- **Optimal stopping point**: Is there an epoch where generalization peaks before overfitting?
-
-## Expected Results
-
-- **Early epochs**: Generated images recognizable but low quality, high variation
-- **Mid epochs**: Quality improves, some structure learned
-- **Late epochs**: High-quality generation, stable patterns, true generalization
-- **Very late epochs**: Possible quality saturation or slight degradation
-
-## Comparison: Learning Curves
-
-The project captures evolution across training:
-
-| Training Stage | Samples | Quality | Diversity | Generalization |
-|----------------|---------|---------|-----------|-----------------|
-| Early (1K) | Memorized patterns | Low | High (noise) | Poor |
-| Mid (10K) | Mixed | Medium | Medium | Improving |
-| Late (20K) | Learned patterns | High | Moderate | Excellent |
-
-## Applications
-
-This experiment is crucial for:
-- **Understanding convergence**: How to monitor generalization during training
-- **Stopping criteria**: When should training stop?
-- **Regularization tuning**: How does regularization affect memory-generalization tradeoff?
-- **Theoretical insights**: Validating theories about local learning and generalization
-
----
-
-**Key Insight**: This extended study provides empirical evidence for how local, asymmetric learning rules balance memorization and generalization over realistic training timescales.
+Tip: Execute the scripts strictly in numerical order (1 -> 6). Since Script 1 runs an extensive parameter sweep, ensure you have sufficient compute time or reduce `num_runs` / `target_steps` for a quicker test!
