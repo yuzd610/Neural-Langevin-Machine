@@ -1,7 +1,7 @@
 Scheduled Dynamics Energy-Based Model (PCD) on MNIST
 
 Overview
-This project implements a continuous Energy-Based Model (EBM) trained on a subset of MNIST digits (1, 3, and 6) using Persistent Contrastive Divergence (PCD). The defining and unique characteristic of this specific implementation is the use of a Scheduled Langevin Dynamics mechanism during the training phase. Specifically, the complex non-linear reaction/coupling term in the dynamics equation is artificially suppressed for the first 150 steps and only activated for the remaining 450 steps. This two-stage "warm-up" allows the persistent chain to undergo initial thermalization before introducing full asymmetric interactions.
+This project implements a continuous Energy-Based Model (EBM) trained on a subset of MNIST digits (1, 3, and 6) using one chain Persistent Contrastive Divergence (PCD). The defining and unique characteristic of this specific implementation is the use of a Scheduled Langevin Dynamics mechanism during the training phase. Specifically, the complex non-linear reaction/coupling term in the dynamics equation is artificially suppressed for the first 150 steps and only activated for the remaining 450 steps. This two-stage "warm-up" allows the persistent chain to undergo initial thermalization before introducing full asymmetric interactions.
 
 Key Features
 - Scheduled Langevin Dynamics: Employs a time-dependent binary mask (transform_steps) that turns off the non-linear driving force (phi_prime * delta_J) for the first 150 steps of the MCMC chain, activating it only for the final 450 steps.
