@@ -100,13 +100,3 @@ Creates comprehensive visualizations of generated digits alongside training data
 - **vae_mnist_30dim.pth**: Trained VAE weights
 - **compressed_matrix.npy**: Encoded training data
 
-## Workflow
-
-1. **Autoencoding**: Learn efficient 30D representation of 784D images
-2. **Latent Learning**: Train generative model in compact space
-3. **Generation**: Sample latent codes, decode to images
-4. **Analysis**: Evaluate quality in both latent and image domains
-
----
-
-**Tip**: Compare results with PCD-10 to understand the trade-off between speed and working in full image space vs. compressed latent representations.
