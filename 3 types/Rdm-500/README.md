@@ -1,4 +1,4 @@
-Short-Run MCMC Energy-Based Model (CD-k) on MNIST
+Short-Run MCMC Energy-Based Model (Rdm-k) on MNIST
 
 Overview
 This project implements an Energy-Based Model (EBM) trained on MNIST digits (1, 3, and 6) using Short-Run MCMC (Contrastive Divergence with k steps). Unlike Persistent Contrastive Divergence (PCD), this approach resets the Markov chains to random noise at every training iteration and runs Langevin dynamics for a fixed k=500 steps. The project heavily focuses on analyzing the temporal evolution of the generation process, specifically investigating how the model behaves when generating samples at, before, and after the exact k-steps it was trained on.
