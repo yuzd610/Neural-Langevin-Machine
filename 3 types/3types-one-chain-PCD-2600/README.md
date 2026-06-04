@@ -1,123 +1,63 @@
-# 3types-One-Chain-PCD-2600: Extended Scale Experiment
+Persistent Contrastive Divergence (PCD) for Multi-Digit MNIST
 
-## Overview
+Overview
+This project implements an Energy-Based Model (EBM) trained on a specific subset of the MNIST dataset (digits 1, 3, and 6). It uses Persistent Contrastive Divergence (PCD) alongside Langevin dynamics to learn a continuous state-space representation of the data. The project extensively evaluates the generative process across logarithmic timesteps, tracking model quality using specialized metrics like Adversarial Accuracy Improvement (AAI) and the Mean Squared Error (MSE) of the covariance matrix.
 
-This project explores PCD learning at **significantly extended scale** (2600-dimensional chain-based configuration) across **multiple digit types**. By increasing both the system dimensionality and using chain-based or structured sampling patterns, this experiment investigates scalability of the core PCD algorithm and how it handles larger representational capacity.
+Key Features
+- Persistent Contrastive Divergence: Employs a persistent Markov chain to sample from the model distribution for efficient EBM gradient estimation.
+- Continuous Langevin Dynamics: Uses continuous-time evolution with added noise (temperature T) to generate and sample data.
+- Specialized Evaluation Metrics: Computes the AAI metric (a nearest-neighbor 2-sample test) and Second Moment (Covariance) MSE to rigorously evaluate the statistical fidelity of generated samples.
+- Trajectory Tracking: Generates and records sample trajectories across exponential/logarithmic parameter update steps to study the steady-state convergence.
 
-The "3types" nomenclature suggests this variant explores patterns across different digit categories or learning regimes simultaneously.
+Project Structure
+EBM_PCD_MNIST/
+├── 1train_one_sample_multi.py    # Trains the EBM on digits 1, 3, 6 using PCD and saves checkpoints
+├── 2generate_multi.py            # Generates image trajectories using Langevin dynamics from checkpoints
+├── 3AAI_multi_MSE.py             # Evaluates generation quality (AAI & Covariance MSE) and plots results
+├── 4image generate.py            # Visualizes a grid of generated images across different parameter updates
+├── config.py                     # Centralized hyperparameters for training and generation
+├── checkpoints/                  # Directory storing saved J and B_bias matrices over time
+├── generated_trajectories/       # Directory storing the generated trajectories (.npy)
+├── aai_evolution.pdf             # Output plot: AAI evolution over generation steps
+├── steady_state.pdf              # Output plot: Steady-state metrics vs training updates
+├── mse_cov_evolution.pdf         # Output plot: Covariance MSE evolution
+├── compact_comparison_*.pdf      # Output plot: Grid visualizations of generated images
+└── data/                         # MNIST dataset storage (downloaded automatically)
 
-## Key Features
+Configuration
+Key hyperparameters defined in config.py:
 
-- **Extended Dimensionality**: 2600-D system vs. standard 784-D
-- **Chain-Based Sampling**: Potentially structured or sequential sampling
-- **Multi-Type Learning**: Learning across multiple digit categories
-- **Scalability Analysis**: Tests algorithm performance at scale
-- **Larger Capacity**: More parameters for capturing complex distributions
+- N: 784 (Dimensionality of flattened 28x28 images)
+- g: 2 (Initialization scaling factor for weight matrix J)
+- delta_t: 0.01 (Time step for Langevin dynamics)
+- n: 240 (Total training epochs)
+- k: 2600 (Number of Langevin steps for model sampling)
+- T: 1 (Temperature/Noise scale for dynamics)
+- eta: 0.0005 (Learning rate for Adam optimizer)
+- lambda1: 0.000005 (L2 weight decay applied to J matrix)
 
-## Project Structure
+Usage
 
-```
-3types-one-chain-PCD-2600/
-├── 1train_one_sample_multi.py     # Train with one-sample regime
-├── 2generate_multi.py             # Generate samples
-├── 3AAI_multi_MSE.py              # MSE analysis
-├── 4image generate.py             # Visualize results
-├── config.py                      # Hyperparameters
-├── B_bias.npy                     # Learned biases
-├── J_final.npy                    # Final weights
-├── checkpoints/                   # Training checkpoints
-├── combined_visualizations/       # Visualizations
-├── generated_trajectories/        # Generation dynamics
-└── data/                          # Dataset storage
-```
+1. Train the EBM using PCD
+Run: python 1train_one_sample_multi.py
+Filters the dataset for digits 1, 3, and 6. Runs persistent contrastive divergence, updating the J matrix (zero-diagonal) and B bias, and saves model checkpoints at logarithmically spaced steps in the /checkpoints folder.
 
-## Configuration
+2. Generate Trajectories
+Run: python 2generate_multi.py
+Loads the saved model checkpoints and simulates Langevin dynamics starting from random noise. Saves the generated sample trajectories at specific logarithmic timesteps into the /generated_trajectories folder.
 
-Key parameters in `config.py`:
+3. Evaluate Metrics (AAI & MSE)
+Run: python 3AAI_multi_MSE.py
+Compares the real MNIST data against the generated samples across different checkpoints. Computes the AAI and Covariance MSE, generating three comprehensive PDF plots demonstrating the model's convergence to the true data distribution.
 
-- `N`: System dimensionality (2600 - extended size)
-- `g`: Coupling strength
-- `delta_t`: Time step
-- `n`: Training epochs
-- `k`: Learning rate
-- `T`: Temperature
-- `N_data`: Training samples
-- `lambda1`: L2 regularization
-- `b_size`: Batch size
+4. Visualize Generated Images
+Run: python 4image generate.py
+Parses the generated trajectory files and creates a seamless, compact visual grid of generated digits at specific training checkpoints (e.g., 342, 988, 2854, etc.), saved as a PDF.
 
-## Usage
+Workflow
+1. Training: Maps discrete images to continuous space via atanh, then learns the EBM landscape using data gradients and model gradients (sampled via a persistent Langevin chain).
+2. Generation: Reverses the process by starting with noise and allowing the learned energy landscape to guide the Langevin dynamics toward valid digit states.
+3. Evaluation: Uses rigorous statistical metrics (AAI and 2nd Moment MSE) rather than just visual inspection to prove the model has accurately captured the target distribution.
+4. Visualization: Compiles visual evidence of the model's generative improvement over parameter updates.
 
-### 1. Train Extended Scale Model
-
-```bash
-python 1train_one_sample_multi.py
-```
-
-Trains the 2600-D model, potentially from one representative sample per type to test generalization at scale.
-
-### 2. Generate Samples
-
-```bash
-python 2generate_multi.py
-```
-
-Generates samples from the extended model.
-
-### 3. Compute MSE Analysis
-
-```bash
-python 3AAI_multi_MSE.py
-```
-
-Analyzes quality metrics for scaled experiment.
-
-### 4. Visualize Results
-
-```bash
-python 4image generate.py
-```
-
-Visualizes generated content (with dimensionality considerations).
-
-## Output
-
-- **checkpoints/**: Training checkpoints
-- **generated_trajectories/**: Generation dynamics
-- **combined_visualizations/**: Results and analysis
-- **B_bias.npy**, **J_final.npy**: Learned large-scale parameters
-
-## Workflow
-
-1. **Training**: PCD at extended (2600-D) scale
-2. **Generation**: Large-capacity network dynamics
-3. **Analysis**: Understanding scalability
-4. **Comparison**: Performance vs. standard 784-D
-
-## Research Questions
-
-- **Scalability**: How does PCD perform with 3x larger dimensionality?
-- **Chain Structure**: Does structured sampling improve learning?
-- **Multi-Type Learning**: Can network learn multiple categories simultaneously?
-- **Convergence**: Does learning become more or less efficient at scale?
-- **Capacity**: Does extra capacity improve or hurt generative performance?
-
-## Performance Considerations
-
-- **Training Time**: Significantly longer than 784-D (higher dimensional optimization)
-- **Memory Usage**: ~10x larger weight matrix than standard
-- **Convergence**: May require modified learning rates/regularization
-- **Generation**: Slower simulation due to larger system
-
-## Comparison
-
-| Metric | Standard 784-D | 3types-2600-D |
-|--------|----------------|---------------|
-| Dimensionality | 784 | 2600 |
-| Weight Matrix Size | 614,656 | ~6.76M parameters |
-| Capacity | Low | High |
-| Training Speed | Fast | Slower |
-| Generation Quality | Known | Comparative |
-
----
-
-**Research Focus**: This experiment is key for understanding scalability limits of local, asymmetric learning rules. Does performance improve with capacity or does it saturate/degrade?
+Tip: Execute the scripts strictly in numerical order (1 -> 2 -> 3 -> 4) as each script heavily relies on the output files generated by the preceding step!
